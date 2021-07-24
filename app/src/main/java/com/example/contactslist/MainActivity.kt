@@ -33,16 +33,11 @@ class MainActivity : BaseActivity() {
     private fun setupRecyclerView() {
         // I suppose that 'binding' is missing here
         recyclerView.layourManager = LinearLayoutManager(this)
-        recyclerView.adapter =
-    }
-
-    private fun createContactsList() {
-
     }
 
     override fun onResume() {
         super.onResume()
-        adapter.notifyDataSetChanged()
+        onClickSearch()
     }
 
     private fun onClickAdd() {

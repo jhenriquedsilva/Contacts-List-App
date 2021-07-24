@@ -1,12 +1,12 @@
 package com.example.contactslist
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import com.example.contactslist.application.ContactApplication
 
 class ContactActivity : BaseActivity() {
 
-    private var index: Int = -1
+    private var contactID: Int = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -17,32 +17,34 @@ class ContactActivity : BaseActivity() {
     }
 
     private fun setupContact() {
-        index = intent.getIntExtra("index", -1)
-        if (index == -1) {
+        contactID = intent.getIntExtra("index", -1)
+        if (contactID == -1) {
             deleteContactButton.visibility = View.GONE
             return
         }
-        editTextName.setText(ContactSingleton.list[index].name)
-        editTextPhoneNumber.setText(ContactSingleton.list[index].phoneNumber)
+        var list = ContactApplication.instance.helperDB?.searchContact("$contactID", true) ?: return
+        var contact = list.getOrNull(0) ?: return
+        editTextName.setText(contact.name)
+        editTextPhoneNumber.setText(contact.phoneNumber)
     }
 
     private fun onClickSaveContact() {
         val name = editTextName.text.toString()
         val phoneNumber = editPhoneNUmber.text.toString()
-        val contact = ContactsVO(0,name,phoneNumber)
+        val contact = ContactsVO(contactID,name,phoneNumber)
 
-        if (index == -1) {
-            ContactSingleton.list.add(contact)
+        if (contactID == -1) {
+            ContactApplication.instance.helperDB?.saveContact(contact)
         } else {
-            ContactSingleton.list.set(index,contact)
+            ContactApplication.instance.helperDB?.updateContact(contact)
         }
 
         finish()
     }
 
     fun onCLickRemoveContact(view: View) {
-        if (index > -1) {
-            ContactSingleton.list.removeAt(index)
+        if (contactID > -1) {
+            ContactApplication.instance.helperDB?.deleteCOntact(contactID)
             finish()
         }
     }

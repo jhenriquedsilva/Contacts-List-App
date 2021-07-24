@@ -22,7 +22,7 @@ class ContactAdapter(
         with(holder.itemView) {
             nameTextView.text = contact.name
             phoneNumberTextView.text = contact.phoneNumber
-            itemLinearLayout.setOnClickListener { onClick(position) }
+            itemLinearLayout.setOnClickListener { onClick(contact.id) }
         }
     }
 }
