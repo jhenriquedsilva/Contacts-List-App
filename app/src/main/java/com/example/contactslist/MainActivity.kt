@@ -53,15 +53,22 @@ class MainActivity : BaseActivity() {
 
     private fun onClickSearch() {
         val search = etSearch.text.toString()
-        var filteredList: List<ContactVO> = mutableListOf()
-        try {
-            filteredList = ContactApplication.instance.helperDB?.searchContact(search) ?: mutableListOf()
-        } catch(ex: Exception){
-            ex.printStackTrace()
-        }
 
-        adapter = ContactAdapter(this, filteredList) { onClickItemRecyclerView(it) }
-        recylerView.adapter = adapter
-        Toast.makeText(this,"Searching for $search",Toast.LENGTH_SHORT).show()
+        Thread(Runnable {
+            var filteredList: List<ContactVO> = mutableListOf()
+            try {
+                filteredList = ContactApplication.instance.helperDB?.searchContact(search) ?: mutableListOf()
+            } catch(ex: Exception){
+                ex.printStackTrace()
+            }
+
+            runOnUiThread {
+                adapter = ContactAdapter(this, filteredList) { onClickItemRecyclerView(it) }
+                recylerView.adapter = adapter
+                Toast.makeText(this,"Searching for $search",Toast.LENGTH_SHORT).show()
+            }
+
+        }).start()
+
     }
 }

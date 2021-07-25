@@ -22,10 +22,15 @@ class ContactActivity : BaseActivity() {
             deleteContactButton.visibility = View.GONE
             return
         }
-        var list = ContactApplication.instance.helperDB?.searchContact("$contactID", true) ?: return
-        var contact = list.getOrNull(0) ?: return
-        editTextName.setText(contact.name)
-        editTextPhoneNumber.setText(contact.phoneNumber)
+
+        Thread(Runnable {
+            var list = ContactApplication.instance.helperDB?.searchContact("$contactID", true) ?: return@Runnable
+            var contact = list.getOrNull(0) ?: return@Runnable
+            runOnUiThread{
+                editTextName.setText(contact.name)
+                editTextPhoneNumber.setText(contact.phoneNumber)
+            }
+        }).start()
     }
 
     private fun onClickSaveContact() {
@@ -33,19 +38,26 @@ class ContactActivity : BaseActivity() {
         val phoneNumber = editPhoneNUmber.text.toString()
         val contact = ContactsVO(contactID,name,phoneNumber)
 
-        if (contactID == -1) {
-            ContactApplication.instance.helperDB?.saveContact(contact)
-        } else {
-            ContactApplication.instance.helperDB?.updateContact(contact)
-        }
-
-        finish()
+        Thread(Runnable {
+            if (contactID == -1) {
+                ContactApplication.instance.helperDB?.saveContact(contact)
+            } else {
+                ContactApplication.instance.helperDB?.updateContact(contact)
+            }
+            runOnUiThread {
+                finish()
+            }
+        }).start()
     }
 
     fun onCLickRemoveContact(view: View) {
-        if (contactID > -1) {
-            ContactApplication.instance.helperDB?.deleteCOntact(contactID)
-            finish()
-        }
+        Thread(Runnable{
+            if (contactID > -1) {
+                ContactApplication.instance.helperDB?.deleteContact(contactID)
+                runOnUiThread {
+                    finish()
+                }
+            }
+        }).start()
     }
 }
